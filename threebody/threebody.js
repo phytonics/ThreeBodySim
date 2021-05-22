@@ -2,7 +2,7 @@
     "use strict";
     // A Slider UI element
     function SickSlider(sliderElementSelector) {
-        var that = {
+        const that = {
             // A function that will be called when user changes the slider position.
             // The function will be passed the slider position: a number between 0 and 1.
             onSliderChange: null,
@@ -18,7 +18,7 @@
         that.init = function(sliderElementSelector) {
             that.slider = document.querySelector(sliderElementSelector);
             that.sliderHead = that.slider.querySelector(".SickSlider-head");
-            var sliding = false;
+            let sliding = false;
 
             // Start dragging slider
             // -----------------
@@ -46,7 +46,7 @@
                 sliding = false;
             });
 
-            document.addEventListener("touchend", function(e) {
+            document.addEventListener("touchend", function() {
                 sliding = false;
             });
 
@@ -77,14 +77,14 @@
         //   e: a touch event.
         //
         that.sliderValueFromCursor = function(e) {
-            var pointerX = e.pageX;
+            let pointerX = e.pageX;
 
             if (e.touches && e.touches.length > 0) {
                 pointerX = e.touches[0].pageX;
             }
 
             pointerX = pointerX - that.slider.offsetLeft;
-            var headLeft = (pointerX - 16);
+            let headLeft = (pointerX - 16);
             if (headLeft < 0) { headLeft = 0; }
 
             if ((headLeft + that.sliderHead.offsetWidth) > that.slider.offsetWidth) {
@@ -92,8 +92,8 @@
             }
 
             // Calculate slider value from head position
-            var sliderWidthWithoutHead = that.slider.offsetWidth - that.sliderHead.offsetWidth;
-            var sliderValue = 1;
+            const sliderWidthWithoutHead = that.slider.offsetWidth - that.sliderHead.offsetWidth;
+            let sliderValue = 1;
 
             if (sliderWidthWithoutHead !== 0) {
                 sliderValue = headLeft / sliderWidthWithoutHead;
@@ -110,7 +110,7 @@
         //   sliderValue: a value between 0 and 1.
         //
         that.changePosition = function(sliderValue) {
-            var headLeft = (that.slider.offsetWidth - that.sliderHead.offsetWidth) * sliderValue;
+            const headLeft = (that.slider.offsetWidth - that.sliderHead.offsetWidth) * sliderValue;
             that.sliderHead.style.left = headLeft + "px";
         };
 
@@ -121,7 +121,7 @@
         //   e: a touch event.
         //
         that.updateHeadPositionOnTouch = function(e) {
-            var sliderValue = that.sliderValueFromCursor(e);
+            const sliderValue = that.sliderValueFromCursor(e);
 
             // Handle the head change only if it changed significantly (more than 0.1%)
             if (Math.round(that.previousSliderValue * 10000) === Math.round(sliderValue * 10000)) { return; }
@@ -150,11 +150,11 @@
     }
 
     // Show debug messages on screen
-    var debug = (function(){
-        var debugOutput = document.querySelector(".ThreeBodyProblem-debugOutput");
+    const debug = (function () {
+        const debugOutput = document.querySelector(".ThreeBodyProblem-debugOutput");
 
         function print(text) {
-            var date = new Date();
+            const date = new Date();
             debugOutput.innerHTML = text + " " + date.getMilliseconds();
         }
 
@@ -164,28 +164,29 @@
     })();
 
     // Runge-Kutta numerical integration
-    var rungeKutta = (function() {
-        // h: timestep
+    const rungeKutta = (function () {
+        // h: time-step
         // u: variables
         // derivative: function that calculates the derivatives
         function calculate(h, u, derivative) {
-            var a = [h/2, h/2, h, 0];
-            var b = [h/6, h/3, h/3, h/6];
-            var u0 = [];
-            var ut = [];
-            var dimension = u.length;
+            let i;
+            const a = [h / 2, h / 2, h, 0];
+            const b = [h / 6, h / 3, h / 3, h / 6];
+            const u0 = [];
+            const ut = [];
+            const dimension = u.length;
 
-            for (var i = 0; i < dimension; i++) {
+            for (i = 0; i < dimension; i++) {
                 u0.push(u[i]);
                 ut.push(0);
             }
 
-            for (var j = 0; j < 4; j++) {
-                var du = derivative();
+            for (let j = 0; j < 4; j++) {
+                const du = derivative();
 
                 for (i = 0; i < dimension; i++) {
-                    u[i] = u0[i] + a[j]*du[i];
-                    ut[i] = ut[i] + b[j]*du[i];
+                    u[i] = u0[i] + a[j] * du[i];
+                    ut[i] = ut[i] + b[j] * du[i];
                 }
             }
 
@@ -200,15 +201,15 @@
     })();
 
     // Calculates the simulation of the three bodies
-    var physics = (function() {
-        var constants = {
+    const physics = (function () {
+        const constants = {
             gravitationalConstant: 6.67408 * Math.pow(10, -11),
             // Average density of the body (kg/m^3). Used for calculating body's radius form its mass
             averageDensity: 1410
         };
 
         // Current state of the system
-        var state = {
+        const state = {
             // State variables used in the differential equations
             // First two elements are x and y positions, and second two are x and y components of velocity
             // repeated for three bodies.
@@ -216,23 +217,24 @@
         };
 
         // Initial condition of the model. The conditions are loaded from the currently selected simulation.
-        var initialConditions = {
+        const initialConditions = {
             bodies: 3, // Number of bodies
         };
 
         // Calculate the radius of the body (in meters) based on its mass.
         function calculateRadiusFromMass(mass, density) {
-            return Math.pow(3/4 * mass / ( Math.PI * density), 1/3);
+            return Math.pow(3 / 4 * mass / (Math.PI * density), 1 / 3);
         }
 
         // Returns the diameters of three bodies in meters
         function calculateDiameters() {
-            var diameters = [];
+            let density;
+            const diameters = [];
 
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
-                if (initialConditions.densities !== undefined && initialConditions.densities.length >= initialConditions.bodies-1) {
-                    var density = initialConditions.densities[iBody];
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
+                if (initialConditions.densities !== undefined && initialConditions.densities.length >= initialConditions.bodies - 1) {
+                    density = initialConditions.densities[iBody];
                 } else {
                     density = constants.averageDensity;
                 }
@@ -243,13 +245,13 @@
             return diameters;
         }
 
-        function calculateCenterOfMassVelocity(){
-            var centerOfMassVelocity = {x: 0, y: 0};
-            var sumOfMasses = 0;
+        function calculateCenterOfMassVelocity() {
+            const centerOfMassVelocity = {x: 0, y: 0};
+            let sumOfMasses = 0;
 
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
-                var bodyStart = iBody * 4; // Starting index for current body in the u array
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
+                const bodyStart = iBody * 4; // Starting index for current body in the u array
                 centerOfMassVelocity.x += initialConditions.masses[iBody] * state.u[bodyStart + 2];
                 centerOfMassVelocity.y += initialConditions.masses[iBody] * state.u[bodyStart + 3];
                 sumOfMasses += initialConditions.masses[iBody];
@@ -261,14 +263,14 @@
             return centerOfMassVelocity;
         }
 
-        function calculateCenterOfMass(){
-            var centerOfMass = {x: 0, y: 0};
-            var sumOfMasses = 0;
+        function calculateCenterOfMass() {
+            const centerOfMass = {x: 0, y: 0};
+            let sumOfMasses = 0;
 
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
-                var bodyStart = iBody * 4; // Starting index for current body in the u array
-                centerOfMass.x += initialConditions.masses[iBody] * state.u[bodyStart + 0];
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
+                const bodyStart = iBody * 4; // Starting index for current body in the u array
+                centerOfMass.x += initialConditions.masses[iBody] * state.u[bodyStart];
                 centerOfMass.y += initialConditions.masses[iBody] * state.u[bodyStart + 1];
                 sumOfMasses += initialConditions.masses[iBody];
             }
@@ -280,29 +282,29 @@
         }
 
         function resetStateToInitialConditions() {
-            var iBody, bodyStart;
+            let iBody, bodyStart;
 
             // Loop through the bodies
             for (iBody = 0; iBody < initialConditions.bodies; iBody++) {
                 bodyStart = iBody * 4; // Starting index for current body in the u array
 
-                var position = initialConditions.positions[iBody];
-                state.u[bodyStart + 0] = position.r * Math.cos(position.theta); // x
+                const position = initialConditions.positions[iBody];
+                state.u[bodyStart] = position.r * Math.cos(position.theta); // x
                 state.u[bodyStart + 1] = position.r * Math.sin(position.theta); //y
 
-                var velocity = initialConditions.velocities[iBody];
+                const velocity = initialConditions.velocities[iBody];
                 state.u[bodyStart + 2] = velocity.r * Math.cos(velocity.theta); // velocity x
                 state.u[bodyStart + 3] = velocity.r * Math.sin(velocity.theta); // velocity y
             }
 
-            var centerOfMassVelocity = calculateCenterOfMassVelocity();
-            var centerOfMass = calculateCenterOfMass();
+            const centerOfMassVelocity = calculateCenterOfMassVelocity();
+            const centerOfMass = calculateCenterOfMass();
 
             // Correct the velocities and positions of the bodies
             // to make the center of mass motionless at the middle of the screen
             for (iBody = 0; iBody < initialConditions.bodies; iBody++) {
                 bodyStart = iBody * 4; // Starting index for current body in the u array
-                state.u[bodyStart + 0] -= centerOfMass.x;
+                state.u[bodyStart] -= centerOfMass.x;
                 state.u[bodyStart + 1] -= centerOfMass.y;
                 state.u[bodyStart + 2] -= centerOfMassVelocity.x;
                 state.u[bodyStart + 3] -= centerOfMassVelocity.y;
@@ -315,23 +317,25 @@
         //   iFromBody: the index of body. 0 is first body, 1 is second body.
         //   coordinate: 0 for x coordinate, 1 for y coordinate
         function acceleration(iFromBody, coordinate) {
-            var result = 0;
-            var iFromBodyStart = iFromBody * 4; // Starting index for the body in the u array
+            let result = 0;
+            const iFromBodyStart = iFromBody * 4; // Starting index for the body in the u array
 
             // Loop through the bodies
-            for (var iToBody = 0; iToBody < initialConditions.bodies; iToBody++) {
-                if (iFromBody === iToBody) { continue; }
-                var iToBodyStart = iToBody * 4; // Starting index for the body in the u array
+            for (let iToBody = 0; iToBody < initialConditions.bodies; iToBody++) {
+                if (iFromBody === iToBody) {
+                    continue;
+                }
+                const iToBodyStart = iToBody * 4; // Starting index for the body in the u array
 
                 // Distance between the two bodies
-                var distanceX = state.u[iToBodyStart + 0] -
-                    state.u[iFromBodyStart + 0];
+                const distanceX = state.u[iToBodyStart] -
+                    state.u[iFromBodyStart];
 
-                var distanceY = state.u[iToBodyStart + 1] -
+                const distanceY = state.u[iToBodyStart + 1] -
                     state.u[iFromBodyStart + 1];
 
-                var distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
-                var gravitationalConstant = 1;
+                const distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+                let gravitationalConstant = 1;
 
                 if (initialConditions.dimensionless !== true) {
                     gravitationalConstant = constants.gravitationalConstant;
@@ -348,15 +352,15 @@
 
         // Calculate the derivatives of the system of ODEs that describe equation of motion of the bodies
         function derivative() {
-            var du = new Array(initialConditions.bodies * 4);
+            const du = new Array(initialConditions.bodies * 4);
 
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
                 // Starting index for current body in the u array
-                var bodyStart = iBody * 4;
+                const bodyStart = iBody * 4;
 
-                du[bodyStart + 0] = state.u[bodyStart + 0 + 2]; // Velocity x
-                du[bodyStart + 1] = state.u[bodyStart + 0 + 3]; // Velocity y
+                du[bodyStart] = state.u[bodyStart + 2]; // Velocity x
+                du[bodyStart + 1] = state.u[bodyStart + 3]; // Velocity y
                 du[bodyStart + 2] = acceleration(iBody, 0); // Acceleration x
                 du[bodyStart + 3] = acceleration(iBody, 1); // Acceleration y
             }
@@ -366,27 +370,27 @@
 
         // The main function that is called on every animation frame.
         // It calculates and updates the current positions of the bodies
-        function updatePosition(timestep) {
-            rungeKutta.calculate(timestep, state.u, derivative);
+        function updatePosition(time_step) {
+            rungeKutta.calculate(time_step, state.u, derivative);
         }
 
         function calculateNewPosition() {
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
-                var bodyStart = iBody * 4; // Starting index for current body in the u array
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
+                const bodyStart = iBody * 4; // Starting index for current body in the u array
 
-                state.positions[iBody].x = state.u[bodyStart + 0];
+                state.positions[iBody].x = state.u[bodyStart];
                 state.positions[iBody].y = state.u[bodyStart + 1];
             }
         }
 
-        // Returns the largest distance of an object from the center based on initial considitions
+        // Returns the largest distance of an object from the center based on initial conditions
         function largestDistanceMeters() {
-            var result = 0;
+            let result = 0;
 
             // Loop through the bodies
-            for (var iBody = 0; iBody < initialConditions.bodies; iBody++) {
-                var position = initialConditions.positions[iBody];
+            for (let iBody = 0; iBody < initialConditions.bodies; iBody++) {
+                const position = initialConditions.positions[iBody];
                 if (result < position.r) {
                     result = position.r;
                 }
@@ -421,18 +425,18 @@
     })();
 
     // Draw the scene
-    var graphics = (function() {
-        var canvas = null, // Canvas DOM element.
+    const graphics = (function () {
+        let canvas = null, // Canvas DOM element.
             context = null, // Canvas context for drawing.
             canvasHeight = 600,
             // The scaling factor used to draw distances between the objects and their sizes
             // Updated automatically on first draw
             metersPerPixel = 100,
-            minimumSizePixels=10, // Minimum size of an object in pixels.
-            maximumSizePixels=80, // Maximum size of an object in pixels.
+            minimumSizePixels = 10, // Minimum size of an object in pixels.
+            maximumSizePixels = 80, // Maximum size of an object in pixels.
             colors = {
-                orbitalPaths: ["#ff8b22","#6c81ff","#4ccd7a"],
-                paleOrbitalPaths: ["#ab681c","#4957ae","#359256"]
+                orbitalPaths: ["#ff8b22", "#6c81ff", "#4ccd7a"],
+                paleOrbitalPaths: ["#ab681c", "#4957ae", "#359256"]
             },
             // Positions of three bodies in pixels on screen
             bodyPositions = [
@@ -447,7 +451,7 @@
                 {x: null, y: null}
             ],
             // Contains the DOM elements of the bodies
-            bodyElemenets = [],
+            bodyElements = [],
             // Body sizes in pixels
             currentBodySizes = [
                 10, 10, 10
@@ -457,8 +461,8 @@
 
 
         function drawBody(position, size, bodyElement) {
-            var left = (position.x - size/2) + 1000;
-            var top = (position.y - size/2) + 1000;
+            const left = (position.x - size / 2) + 1000;
+            const top = (position.y - size / 2) + 1000;
             // Using style.transform instead of style.left, since style.left was
             // noticeably slower on mobile Chrome
             bodyElement.style.transform = "translate(" + left + "px," + top + "px)";
@@ -468,8 +472,8 @@
         //    sizes: the sizes of objects in meters
         function updateObjectSizes(sizes) {
             // Loop through the bodies
-            for (var iBody = 0; iBody < sizes.length; iBody++) {
-                currentBodySizes[iBody] =  sizes[iBody] / metersPerPixel;
+            for (let iBody = 0; iBody < sizes.length; iBody++) {
+                currentBodySizes[iBody] = sizes[iBody] / metersPerPixel;
 
                 if (currentBodySizes[iBody] < minimumSizePixels) {
                     currentBodySizes[iBody] = minimumSizePixels;
@@ -479,7 +483,7 @@
                     currentBodySizes[iBody] = maximumSizePixels;
                 }
 
-                bodyElemenets[iBody].style.width = currentBodySizes[iBody] + "px";
+                bodyElements[iBody].style.width = currentBodySizes[iBody] + "px";
             }
         }
 
@@ -505,8 +509,8 @@
         function calculatePosition(position) {
             middleX = Math.floor(canvas.width / 2);
             middleY = Math.floor(canvas.height / 2);
-            var centerX = position.x / metersPerPixel + middleX;
-            var centerY = -position.y / metersPerPixel + middleY;
+            const centerX = position.x / metersPerPixel + middleX;
+            const centerY = -position.y / metersPerPixel + middleY;
 
             return {
                 x: centerX,
@@ -518,11 +522,11 @@
         // from the given state variables
         function calculateNewPositions(statePositions) {
             // Loop through the bodies
-            for (var iBody = 0; iBody < statePositions.length / 4; iBody++) {
-                var bodyStart = iBody * 4; // Starting index for current body in the u array
+            for (let iBody = 0; iBody < statePositions.length / 4; iBody++) {
+                const bodyStart = iBody * 4; // Starting index for current body in the u array
 
-                var x = statePositions[bodyStart + 0];
-                var y = statePositions[bodyStart + 1];
+                const x = statePositions[bodyStart];
+                const y = statePositions[bodyStart + 1];
 
                 middleX = Math.floor(canvas.width / 2);
                 middleY = Math.floor(canvas.height / 2);
@@ -533,35 +537,35 @@
 
         function drawBodies() {
             // Loop through the bodies
-            for (var iBody = 0; iBody < bodyPositions.length; iBody++) {
-                var bodyPosition = bodyPositions[iBody];
-                drawBody(bodyPosition, currentBodySizes[iBody], bodyElemenets[iBody]);
+            for (let iBody = 0; iBody < bodyPositions.length; iBody++) {
+                const bodyPosition = bodyPositions[iBody];
+                drawBody(bodyPosition, currentBodySizes[iBody], bodyElements[iBody]);
             }
         }
 
         function drawOrbitalLines(paleOrbitalPaths) {
             // Loop through the bodies
-            for (var iBody = 0; iBody < bodyPositions.length; iBody++) {
-                var bodyPosition = bodyPositions[iBody];
-                var orbitalPathColors = paleOrbitalPaths ? colors.paleOrbitalPaths : colors.orbitalPaths;
+            for (let iBody = 0; iBody < bodyPositions.length; iBody++) {
+                const bodyPosition = bodyPositions[iBody];
+                const orbitalPathColors = paleOrbitalPaths ? colors.paleOrbitalPaths : colors.orbitalPaths;
                 drawOrbitalLine(bodyPosition, previousBodyPositions[iBody], orbitalPathColors[iBody]);
             }
         }
 
         function showCanvasNotSupportedMessage() {
-            document.getElementById("ThreeBodyProblem-notSupportedMessage").style.display ='block';
+            document.getElementById("ThreeBodyProblem-notSupportedMessage").style.display = 'block';
         }
 
         // Resize canvas to will the width of container
-        function fitToContainer(){
+        function fitToContainer() {
 
             // Adjust the canvas to the size of the screen
             canvasHeight = Math.min(window.innerHeight, window.innerWidth) - 100;
             document.querySelector(".ThreeBodyProblem-container").style.height = canvasHeight + 'px';
 
-            canvas.style.width='100%';
-            canvas.style.height= canvasHeight + 'px';
-            canvas.width  = canvas.offsetWidth;
+            canvas.style.width = '100%';
+            canvas.style.height = canvasHeight + 'px';
+            canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
         }
 
@@ -571,11 +575,15 @@
             canvas = document.querySelector(".ThreeBodyProblem-canvas");
 
             // Check if the browser supports canvas drawing
-            if (!(window.requestAnimationFrame && canvas && canvas.getContext)) { return true; }
+            if (!(window.requestAnimationFrame && canvas && canvas.getContext)) {
+                return true;
+            }
 
             // Get canvas context for drawing
             context = canvas.getContext("2d");
-            if (!context) { return true; } // Error, browser does not support canvas
+            if (!context) {
+                return true;
+            } // Error, browser does not support canvas
             return false;
         }
 
@@ -590,14 +598,14 @@
             // Update the size of the canvas
             fitToContainer();
 
-            var earthElement = document.querySelector(".ThreeBodyProblem-earth");
-            var sunElement = document.querySelector(".ThreeBodyProblem-sun");
-            var jupiterElement = document.querySelector(".ThreeBodyProblem-jupiter");
+            const earthElement = document.querySelector(".ThreeBodyProblem-earth");
+            const sunElement = document.querySelector(".ThreeBodyProblem-sun");
+            const jupiterElement = document.querySelector(".ThreeBodyProblem-jupiter");
 
-            bodyElemenets = [];
-            bodyElemenets.push(sunElement);
-            bodyElemenets.push(earthElement);
-            bodyElemenets.push(jupiterElement);
+            bodyElements = [];
+            bodyElements.push(sunElement);
+            bodyElements.push(earthElement);
+            bodyElements.push(jupiterElement);
 
             // Execute success callback function
             success();
@@ -627,27 +635,27 @@
     })();
 
     // Start the simulation
-    var simulation = (function() {
+    const simulation = (function () {
         // The number of calculations done in one 16 millisecond frame.
         // The higher the number, the more precise are the calculations and the slower the simulation.
-        var calculationsPerFrame = 250;
+        const calculationsPerFrame = 250;
 
-        var framesPerSecond = 60; // Number of frames per second
+        const framesPerSecond = 60; // Number of frames per second
 
         // Maximum number of times the orbital lines are drawn per frame.
         // To improve performance, we do not draw after each calculation, since drawing can be slow.
-        var drawTimesPerFrame = 10;
+        const drawTimesPerFrame = 10;
 
         // Used to decide if we need to draw at calculations
-        var drawIndex =  Math.ceil(calculationsPerFrame / drawTimesPerFrame);
+        const drawIndex = Math.ceil(calculationsPerFrame / drawTimesPerFrame);
 
         // The method is called 60 times per second
         function animate() {
             // The time step in seconds used in simulation
-            var timestep = physics.initialConditions.timeScaleFactor / framesPerSecond / calculationsPerFrame;
+            const time_step = physics.initialConditions.timeScaleFactor / framesPerSecond / calculationsPerFrame;
 
-            for (var i = 0; i < calculationsPerFrame; i++) {
-                physics.updatePosition(timestep);
+            for (let i = 0; i < calculationsPerFrame; i++) {
+                physics.updatePosition(time_step);
 
                 // Decide if we need to draw orbital lines
                 if (i % drawIndex === 0) {
@@ -656,7 +664,7 @@
                 }
             }
 
-            // Move the modies to new a position. This can be slow, because it
+            // Move the bodies to new a position. This can be slow, because it
             // updates the position of the DOM elements.
             // Thus, will call it only once per frame.
             graphics.drawBodies();
@@ -665,13 +673,13 @@
         }
 
         function start() {
-            graphics.init(function() {
+            graphics.init(function () {
                 physics.resetStateToInitialConditions();
                 graphics.clearScene(physics.largestDistanceMeters());
                 graphics.updateObjectSizes(physics.calculateDiameters());
 
                 // Redraw the scene if page is resized
-                window.addEventListener('resize', function(event){
+                window.addEventListener('resize', function () {
                     graphics.fitToContainer();
                     graphics.clearScene(physics.largestDistanceMeters());
                     graphics.calculateNewPositions(physics.state.u);
@@ -689,14 +697,14 @@
     })();
 
     // Helper functions for dealing with CSS
-    var cssHelper = (function(){
+    const cssHelper = (function () {
         function hasClass(element, className) {
-            return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
+            return (' ' + element.className + ' ').indexOf(' ' + className + ' ') > -1;
         }
 
         function removeClass(element, className) {
             element.className = element.className
-                .replace(new RegExp('(?:^|\\s)'+ className + '(?:\\s|$)'), ' ');
+                .replace(new RegExp('(?:^|\\s)' + className + '(?:\\s|$)'), ' ');
         }
 
         function addClass(element, className) {
@@ -712,16 +720,16 @@
     })();
 
     // The presets for different simulations
-    var simulations = (function(){
-        var content = {
+    const simulations = (function () {
+        const content = {
             didChangeModel: null // function handler that is called when user changes a model
         };
 
-        var vigure8Position = {x: 0.97000436, y: -0.24308753};
-        var vigure8Velocity = {x: -0.93240737, y: -0.86473146};
+        const figure8Position = {x: 0.97000436, y: -0.24308753};
+        const figure8Velocity = {x: -0.93240737, y: -0.86473146};
 
         function polarFromCartesian(coordinates) {
-            var angle;
+            let angle;
 
             if (coordinates.x === 0) {
                 angle = 0;
@@ -752,7 +760,7 @@
         //                If not supplied, an average Sun's density is used.
         //    paleOrbitalPaths: If true then the orbital path is paler than usual.
         //
-        var allPresets = {
+        const allPresets = {
             "FigureEight": {
                 dimensionless: true,
                 masses: [1, 1, 1],
@@ -768,14 +776,14 @@
                     power: 5
                 },
                 positions: [ // in Polar coordinates, r is in meters
-                    polarFromCartesian(vigure8Position),
-                    polarFromCartesian({x: -vigure8Position.x, y: -vigure8Position.y}),
+                    polarFromCartesian(figure8Position),
+                    polarFromCartesian({x: -figure8Position.x, y: -figure8Position.y}),
                     polarFromCartesian({x: 0, y: 0})
                 ],
                 velocities: [ // in Polar coordinates, r is in m/s
-                    polarFromCartesian({x: -vigure8Velocity.x / 2, y: -vigure8Velocity.y/2}),
-                    polarFromCartesian({x: -vigure8Velocity.x / 2, y: -vigure8Velocity.y/2}),
-                    polarFromCartesian(vigure8Velocity)
+                    polarFromCartesian({x: -figure8Velocity.x / 2, y: -figure8Velocity.y / 2}),
+                    polarFromCartesian({x: -figure8Velocity.x / 2, y: -figure8Velocity.y / 2}),
+                    polarFromCartesian(figure8Velocity)
                 ]
             },
             "SunEarthJupiter": {
@@ -809,15 +817,15 @@
                 velocities: [ // in Polar coordinates, r is in m/s
                     {
                         r: 0,
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     },
                     {
                         r: 30 * Math.pow(10, 3),
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     },
                     {
                         r: 13.1 * Math.pow(10, 3),
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     }
                 ]
             },
@@ -843,7 +851,7 @@
                     },
                     {
                         r: 7.5 * Math.pow(10, 11),
-                        theta: -Math.PI/3 - Math.PI/10
+                        theta: -Math.PI / 3 - Math.PI / 10
                     },
                     {
                         r: 7.78 * Math.pow(10, 11),
@@ -853,15 +861,15 @@
                 velocities: [ // in Polar coordinates, r is in m/s
                     {
                         r: 0,
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     },
                     {
                         r: 13.3 * Math.pow(10, 3),
-                        theta: Math.PI/6 - Math.PI/10
+                        theta: Math.PI / 6 - Math.PI / 10
                     },
                     {
                         r: 13.1 * Math.pow(10, 3),
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     }
                 ]
             },
@@ -880,11 +888,11 @@
                 },
                 positions: [ // in Polar coordinates, r is in meters
                     {
-                        r: (0.20255 * 0.22431 * 1.496 * Math.pow(10, 11)) / (0.6897 + 0.20255 ),
+                        r: (0.20255 * 0.22431 * 1.496 * Math.pow(10, 11)) / (0.6897 + 0.20255),
                         theta: 0
                     },
                     {
-                        r: (0.6897 * 0.22431 * 1.496 * Math.pow(10, 11)) / (0.6897 + 0.20255 ),
+                        r: (0.6897 * 0.22431 * 1.496 * Math.pow(10, 11)) / (0.6897 + 0.20255),
                         theta: Math.PI
                     },
                     {
@@ -895,15 +903,15 @@
                 velocities: [ // in Polar coordinates, r is in m/s
                     {
                         r: 13 * Math.pow(10, 3),
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     },
                     {
                         r: 44 * Math.pow(10, 3),
-                        theta: 3*Math.PI/2
+                        theta: 3 * Math.PI / 2
                     },
                     {
                         r: 33 * Math.pow(10, 3),
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     }
                 ]
             },
@@ -928,25 +936,25 @@
                     },
                     {
                         r: 1,
-                        theta: 2*Math.PI/3
+                        theta: 2 * Math.PI / 3
                     },
                     {
                         r: 1,
-                        theta: 4*Math.PI/3
+                        theta: 4 * Math.PI / 3
                     }
                 ],
                 velocities: [ // in Polar coordinates, r is in m/s
                     {
                         r: .55,
-                        theta: Math.PI/2
+                        theta: Math.PI / 2
                     },
                     {
                         r: .55,
-                        theta: 2*Math.PI/3 + Math.PI/2
+                        theta: 2 * Math.PI / 3 + Math.PI / 2
                     },
                     {
                         r: .55,
-                        theta: 4*Math.PI/3 + Math.PI/2
+                        theta: 4 * Math.PI / 3 + Math.PI / 2
                     }
                 ]
             },
@@ -958,8 +966,8 @@
                 return;
             }
 
-            var name = element.getAttribute("data-name");
-            var preset = allPresets[name];
+            const name = element.getAttribute("data-name");
+            const preset = allPresets[name];
 
             if (content.didChangeModel !== null) {
                 content.didChangeModel(preset);
@@ -968,27 +976,29 @@
             // Mark the current element as selected
             // -----------
 
-            var presetElements = document.querySelectorAll(".ThreeBodyProblem-preset");
+            const presetElements = document.querySelectorAll(".ThreeBodyProblem-preset");
 
             // Loop through the presets
-            for (var iPreset = 0; iPreset < presetElements.length; iPreset++) {
-                var presetElement = presetElements[iPreset];
+            for (let iPreset = 0; iPreset < presetElements.length; iPreset++) {
+                const presetElement = presetElements[iPreset];
                 cssHelper.removeClass(presetElement, 'ThreeBodyProblem-button--isSelected');
             }
             cssHelper.addClass(element, "ThreeBodyProblem-button--isSelected");
         }
 
         function didClick(e) {
-            if (!e) { e = window.event; }
+            if (!e) {
+                e = window.event;
+            }
             didClickElement(e.target);
         }
 
         function init() {
-            var presetElements = document.querySelectorAll(".ThreeBodyProblem-preset");
+            const presetElements = document.querySelectorAll(".ThreeBodyProblem-preset");
 
             // Loop through the presets
-            for (var iPreset = 0; iPreset < presetElements.length; iPreset++) {
-                var presetElement = presetElements[iPreset];
+            for (let iPreset = 0; iPreset < presetElements.length; iPreset++) {
+                const presetElement = presetElements[iPreset];
                 presetElement.onclick = didClick;
             }
 
@@ -1005,35 +1015,39 @@
     // The function is constructed such that is not very sensitive at the default output value
     // (for example, the starting value for the mass of an object)
     // but rapidly changes as when the slider is moved far away form it.
-    var oddPowerCurve = (function(){
-        function calcualteL(defaultOutput, power) {
+    const oddPowerCurve = (function () {
+        function calculateL(defaultOutput, power) {
             if (power === 0) return 1;
             return -Math.pow(defaultOutput, 1 / power);
         }
 
-        function calcualteA(defaultOutput, power) {
+        function calculateA(defaultOutput, power) {
             if (power === 0) return 1;
-            return Math.pow(1 - defaultOutput, 1 / power) - calcualteL(defaultOutput, power);
+            return Math.pow(1 - defaultOutput, 1 / power) - calculateL(defaultOutput, power);
         }
 
         // Return the slider input value based on the output and default output values
         function sliderInputValue(defaultOutput, output, power) {
             if (power === 0) return 1;
-            var a = calcualteA(defaultOutput, power);
-            if (a === 0) { a = 1; }
-            var l = calcualteL(defaultOutput, power);
-            var sign = (output - defaultOutput) < 0 ? -1 : 1;
+            let a = calculateA(defaultOutput, power);
+            if (a === 0) {
+                a = 1;
+            }
+            const l = calculateL(defaultOutput, power);
+            const sign = (output - defaultOutput) < 0 ? -1 : 1;
             return (sign * Math.pow(Math.abs(output - defaultOutput), 1 / power) - l) / a;
         }
 
         // Return the slider output value based on the input and default output values
-        function sliderOutputValue(defaultOutput, intput, power) {
+        function sliderOutputValue(defaultOutput, input, power) {
             if (power === 0) return 1;
-            var a = calcualteA(defaultOutput, power);
-            var l = calcualteL(defaultOutput, power);
+            const a = calculateA(defaultOutput, power);
+            const l = calculateL(defaultOutput, power);
 
-            var result = Math.pow(a * intput + l, power) + defaultOutput;
-            if (result < 0) { result = 0; }
+            let result = Math.pow(a * input + l, power) + defaultOutput;
+            if (result < 0) {
+                result = 0;
+            }
             return result;
         }
 
@@ -1044,42 +1058,42 @@
     })();
 
     // React to user input
-    var userInput = (function(){
-        var sliderLabelElement = document.querySelector(".ThreeBodyProblem-sliderLabel");
-        var restartButton = document.querySelector(".ThreeBodyProblem-reload");
-        var mass1Button = document.querySelector(".ThreeBodyProblem-mass1Button");
-        var mass2Button = document.querySelector(".ThreeBodyProblem-mass2Button");
-        var mass3Button = document.querySelector(".ThreeBodyProblem-mass3Button");
-        var speedButton = document.querySelector(".ThreeBodyProblem-speedButton");
-        var sliderElement = document.querySelector(".ThreeBodyProblem-slider");
-        var slider;
-        var currentSlider = "mass";
-        var currentMassSliderIndex = 0;
-        var currentModel; // Currently selected model
+    const userInput = (function () {
+        const sliderLabelElement = document.querySelector(".ThreeBodyProblem-sliderLabel");
+        const restartButton = document.querySelector(".ThreeBodyProblem-reload");
+        const mass1Button = document.querySelector(".ThreeBodyProblem-mass1Button");
+        const mass2Button = document.querySelector(".ThreeBodyProblem-mass2Button");
+        const mass3Button = document.querySelector(".ThreeBodyProblem-mass3Button");
+        const speedButton = document.querySelector(".ThreeBodyProblem-speedButton");
+        const sliderElement = document.querySelector(".ThreeBodyProblem-slider");
+        let slider;
+        let currentSlider = "mass";
+        let currentMassSliderIndex = 0;
+        let currentModel; // Currently selected model
 
         // Returns the output value of the slider between 0 to 1 corresponding to the
         // default value of the variable (such as default mass for an object)
         function calculateDefaultSliderOutput(sliderSettings) {
-            var defaultValue = getCurrentSimulationValue(currentModel);
+            const defaultValue = getCurrentSimulationValue(currentModel);
             return (defaultValue - sliderSettings.min) / (sliderSettings.max - sliderSettings.min);
         }
 
         function didUpdateSlider(sliderValue) {
-            var sliderText;
-            var sliderSettings = getCurrentSliderSettings();
+            let sliderText;
+            const sliderSettings = getCurrentSliderSettings();
 
 
             if (sliderSettings.power !== undefined) {
 
                 if (sliderSettings.power % 2 === 1) { // Odd power
-                    var defaultOutput = calculateDefaultSliderOutput(sliderSettings);
+                    const defaultOutput = calculateDefaultSliderOutput(sliderSettings);
                     sliderValue = oddPowerCurve.sliderOutputValue(defaultOutput, sliderValue, sliderSettings.power);
                 } else {
                     sliderValue = Math.pow(sliderValue, sliderSettings.power);
                 }
             }
 
-            var newValue = sliderSettings.min + (sliderSettings.max - sliderSettings.min) * sliderValue;
+            let newValue = sliderSettings.min + (sliderSettings.max - sliderSettings.min) * sliderValue;
             newValue = roundSliderValue(newValue);
 
             if (currentSlider === "mass") {
@@ -1095,7 +1109,7 @@
         }
 
         function getCurrentSliderSettings() {
-            var sliderSettings;
+            let sliderSettings;
 
             if (currentSlider === "mass") {
                 sliderSettings = physics.initialConditions.massSlider;
@@ -1115,7 +1129,7 @@
         }
 
         function bodyNameFromIndex(index) {
-            switch(index) {
+            switch (index) {
                 case 0:
                     return "the Sun";
                 case 1:
@@ -1126,7 +1140,7 @@
         }
 
         function formatMassForSlider(mass) {
-            var formatted = roundSliderValueText(mass);
+            let formatted = roundSliderValueText(mass);
 
             if (mass > 10000) {
                 formatted = mass.toExponential(4);
@@ -1142,8 +1156,8 @@
         }
 
         function formatTimescaleForSlider(value) {
-            var timeHumanized = timeHumanReadable(value);
-            var formatted = roundSliderValueText(timeHumanized.value);
+            const timeHumanized = timeHumanReadable(value);
+            let formatted = roundSliderValueText(timeHumanized.value);
 
             if (timeHumanized.value > 10000) {
                 formatted = timeHumanized.value.toExponential(4);
@@ -1155,7 +1169,7 @@
         }
 
         function timeHumanReadable(time) {
-            var result = {
+            const result = {
                 unit: 'second',
                 value: time
             };
@@ -1206,7 +1220,7 @@
         }
 
         function getCurrentSimulationValue(model) {
-            var simulationValue;
+            let simulationValue;
             if (currentSlider === "mass") {
                 simulationValue = model.masses[currentMassSliderIndex];
             } else {
@@ -1220,14 +1234,14 @@
             cssHelper.removeClass(sliderElement, "ThreeBodyProblem-sliderEarth");
             cssHelper.removeClass(sliderElement, "ThreeBodyProblem-sliderJupiter");
 
-            var sliderSettings = getCurrentSliderSettings();
-            var simulationValue = getCurrentSimulationValue(physics.initialConditions);
-            var sliderText;
+            const sliderSettings = getCurrentSliderSettings();
+            const simulationValue = getCurrentSimulationValue(physics.initialConditions);
+            let sliderText;
 
             if (currentSlider === "mass") {
                 sliderText = formatMassForSlider(physics.initialConditions.masses[currentMassSliderIndex]);
 
-                switch(currentMassSliderIndex) {
+                switch (currentMassSliderIndex) {
                     case 0:
                         cssHelper.addClass(sliderElement, "ThreeBodyProblem-sliderSun");
                         break;
@@ -1242,11 +1256,11 @@
             }
 
             sliderLabelElement.innerText = sliderText;
-            var sliderPosition = (simulationValue - sliderSettings.min) / (sliderSettings.max - sliderSettings.min);
+            let sliderPosition = (simulationValue - sliderSettings.min) / (sliderSettings.max - sliderSettings.min);
 
             if (sliderSettings.power !== undefined) {
                 if (sliderSettings.power % 2 === 1) { // Odd power
-                    var defaultOutput = calculateDefaultSliderOutput(sliderSettings);
+                    const defaultOutput = calculateDefaultSliderOutput(sliderSettings);
                     sliderPosition = oddPowerCurve.sliderInputValue(defaultOutput, sliderPosition, sliderSettings.power);
                 } else {
                     sliderPosition = Math.pow(sliderPosition, 1 / sliderSettings.power);
