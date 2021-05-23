@@ -203,7 +203,7 @@
     // Calculates the simulation of the three bodies
     const physics = (function () {
         const constants = {
-            gravitationalConstant: 6.67408 * Math.pow(10, -11),
+            gravitationalConstant: 6.6743015 * Math.pow(10, -11),
             // Average density of the body (kg/m^3). Used for calculating body's radius form its mass
             averageDensity: 1410
         };
@@ -290,7 +290,7 @@
 
                 const position = initialConditions.positions[iBody];
                 state.u[bodyStart] = position.r * Math.cos(position.theta); // x
-                state.u[bodyStart + 1] = position.r * Math.sin(position.theta); //y
+                state.u[bodyStart + 1] = position.r * Math.sin(position.theta); // y
 
                 const velocity = initialConditions.velocities[iBody];
                 state.u[bodyStart + 2] = velocity.r * Math.cos(velocity.theta); // velocity x
